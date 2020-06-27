@@ -10,14 +10,6 @@ app.use(express.static(publicPath))
 
 app.listen(PORT, err => console.log(err || `Web-vote-app-server is running at PORT:${PORT}`))
 
-// app.get('/', (req, res) => {
-
-// })
-
-// app.get('/vote/:id', (req, res) => {
-//   const id = req.params.id
-//   res.sendFile(publicPath + '/index.html')
-// })
 
 app.get('*', (req, res) => {
   res.sendFile(publicPath + '/index.html')

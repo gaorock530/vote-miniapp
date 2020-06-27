@@ -4,10 +4,11 @@ export default ({data, index, voted}) => {
   const {name, count, percent} = data;
   const bar = useRef()
   const progress = useRef(0)
+  const requestID = useRef()
 
 
   const animation = useCallback(() => {
-    // console.log('change:', progress.current)
+
     // constant speed
     progress.current+= (percent / 100) * 4
     // prevent overflow
@@ -15,12 +16,18 @@ export default ({data, index, voted}) => {
 
     if (bar.current && progress.current <= percent) {
       bar.current.style.width = progress.current + '%'
-      requestAnimationFrame(animation)
+      requestID.current = requestAnimationFrame(animation)
+    } else {
+      cancelAnimationFrame(requestID.current)
     }
   },[percent])
 
   useEffect(() => {
-    requestAnimationFrame(animation)
+    requestID.current = requestAnimationFrame(animation)
+
+    return () => {
+      cancelAnimationFrame(requestID.current)
+    }
   }, [animation])
 
 
