@@ -9,7 +9,9 @@ export default ({data, index, voted}) => {
     console.log('change:', progress.current)
     // constant speed
     progress.current+= (percent / 100) * 4
-    if (progress.current < percent) {
+    if (progress.current > 100) progress.current = 100
+
+    if (progress.current <= percent) {
       bar.current.style.width = progress.current + '%'
       requestAnimationFrame(animation)
     }
