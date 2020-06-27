@@ -6,6 +6,7 @@ export default ({data, index, voted}) => {
   const progress = useRef(0)
 
   const animation = useCallback(() => {
+    console.log('change:', progress.current)
     // constant speed
     progress.current+= (percent / 100) * 4
     if (progress.current < percent) {
