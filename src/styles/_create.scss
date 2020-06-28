@@ -1,0 +1,63 @@
+.create {
+
+  // input {
+  //   width: 100%;
+  // }
+
+  .create-vote-type {
+    label {
+      cursor: pointer;
+      display: inline-block;
+      padding: 5px;
+      margin: 10px 0;
+    }
+    input {
+      margin-right: 3px;
+      appearance: radio;
+    }
+  }
+  
+  .create-vote-option {
+    label {
+      display: inline-block;
+      width: 100%;
+      padding: 5px 0;
+  
+      // change naming later
+      div {
+        display: flex;
+        button {
+          font-size: 1rem;
+        }
+      }
+    }
+    input {
+      width: 100%;
+      font-size: 16px;
+      background-color: #ddd;
+    }
+  }
+  
+
+  button {
+    border: none;
+
+    &.add {
+      font-size: 5rem;
+    }
+
+    &.publish {
+      width: 100%;
+      border: 1px solid orangered;
+      font-size: 1.5rem;
+    }
+    
+    &:hover {
+      color: orangered;
+    }
+  }
+
+  p {
+    text-align: center;
+  }
+}

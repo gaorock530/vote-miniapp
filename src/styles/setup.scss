@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html {
@@ -33,6 +34,12 @@ a {
   }
 }
 
+input {
+  outline: none;
+  appearance: none;
+  padding: 5px 10px;
+}
+
 button {
   cursor: pointer;
   border: 1px solid #eee;
@@ -43,10 +50,10 @@ button {
   background: none;
   color: inherit;
 
-  &:hover {
-    background-color: #ddd;
-    color: #111;
-  }
+  // &:hover {
+  //   background-color: #ddd;
+  //   color: #111;
+  // }
 }
 
 .home {
@@ -72,7 +79,8 @@ button {
   button {
     position: relative;
     display: block;
-    width: calc(50% + 20px);
+    width: 50%;
+    // width: calc(50% + 20px);
     margin: 30px auto;
     padding: 7px 0;
     font-size: 15px;
