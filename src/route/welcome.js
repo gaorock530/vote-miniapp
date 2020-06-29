@@ -5,14 +5,17 @@ export default () => {
   const [last, setLast] = useState(false)
   const history = useHistory()
   const onRecent = () => {
-    history.push({pathname: last})
+    history.push({pathname: `/vote/${last}`})
   }
 
   useEffect(() => {
-    const lastVote = localStorage.getItem('last')
-    if (lastVote) {
-      const data = JSON.parse(lastVote)
-      setLast(data.pathname)
+    const lastVoteID = localStorage.getItem('last')
+    if (lastVoteID) {
+      const lastVote = localStorage.getItem(lastVoteID)
+      if (lastVote) {
+        const data = JSON.parse(lastVote)
+        setLast(lastVoteID)
+      }
     }
   }, [])
 

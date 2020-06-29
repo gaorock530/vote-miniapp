@@ -1,80 +1,60 @@
 import React, { useState, useEffect } from 'react'
-import {useLocation} from 'react-router-dom'
+import {useParams} from 'react-router-dom'
 
 import Option from 'components/option'
 import Result from 'components/result'
 
-const fakeTitle = {
-  id: 1,
-  title: '你最喜欢下面哪个英雄'
-}
-
-const fakeData = [
-  '皮城女警',
-  '寡妇制造者',
-  '阿木木',
-  '伊泽瑞尔'
-]
-
-let tempData = []
-
 
 export default () => {
-  const [voted, setVoted] = useState(-1)
-  const location = useLocation()
+  const [votedData, setVotedData] = useState({title: '', options: [], voted: -1})
+  const {id} = useParams()
 
   useEffect(() => {
-
-    // if user has a vote history, use result mark
-    const last = localStorage.getItem('last')
-    if (last) {
-      const lastVote = JSON.parse(last)
-      if (lastVote.voted !== -1) {
-        setVoted(lastVote.voted)
-
-        // if client refreshes, data will be lost from memory, so we can restore data from localStorage
-        if (tempData.length === 0) {
-          const lastData = localStorage.getItem(fakeTitle.id)
-          if (lastData) tempData = JSON.parse(lastData)
-        }
-      }
+    // loading vote
+    const loadVote = localStorage.getItem(id)
+    if (loadVote) {
+      const parsedVote = JSON.parse(loadVote)
+      setVotedData(parsedVote)
     }
-  }, [])
+  }, [id])
 
   const onSelect = index => {
-    console.log(index, fakeData[index])
+    // pre process data
+    votedData.options.map(op => {
+      if (!op.count) op.count = 0
+      if (!op.percent) op.percent = 0
+      return op
+    })
+    // get total count
+    const total = votedData.options.reduce((c, v) => c + v.count, 1)
 
-    // simulate a server
-    const onlineData = localStorage.getItem(fakeTitle.id)
-
-    if (onlineData) {
-      tempData = JSON.parse(onlineData)
-      const total = tempData.reduce((t, c) => t + c.count, 1)
-      tempData.forEach((v, no) => {
-        if (no === index) v.count++
-        v.percent = Math.floor((v.count / total)*1000) / 10
-      })
-
-    } else {
-      fakeData.forEach((v, no) => {
-        tempData.push({name: v, count: no === index?1:0, percent: no === index?100:0})
-      })
-      
-    }
-    localStorage.setItem(fakeTitle.id, JSON.stringify(tempData))
-    localStorage.setItem('last', JSON.stringify({pathname: location.pathname, voted: index}))
-
+    // calculate percentage for each vote
+    const tempOptions = votedData.options.map((v, no) => {
+      if (no === index) v.count++
+      v.percent = Math.floor((v.count / total)*1000) / 10
+      return v
+    })
+   
+    // form new data
+    const newData = {...votedData, options: tempOptions, voted: index}
     // update state
-    setVoted(index)
+    setVotedData(newData)
+    // update localstorage
+    localStorage.setItem(id, JSON.stringify(newData))
+    localStorage.setItem('last', id)
   }
 
-  const renderOptions = data => data.map((option, index) => <Option key={index} title={option} index={index} onSelect={onSelect}/>)
-  const renderResults = data => data.map((option, index) => <Result key={index} data={option} index={index} voted={voted} />)
 
+  const renderOptions = data => data.map((option, index) => <Option key={option.id} title={option.name} index={index} onSelect={onSelect}/>)
+  const renderResults = data => data.map((option, index) => <Result key={option.id} data={option} index={index} voted={votedData.voted} />)
+  /**
+   * {id, title: titleValue, options: state, voted: -1}
+   */
   return (
     <div className="wrapper">
-      <p className="vote-title">{fakeTitle.title}？</p>
-      {voted === -1?renderOptions(fakeData):renderResults(tempData)}
+      <p className="vote-title">{votedData.title}？</p>
+      {votedData.voted === -1?renderOptions(votedData.options):renderResults(votedData.options)}
     </div>
   )
 }
+// {"id":"ckc0lhfzk000b3b5v9d710hf2","title":"你们最喜欢的召唤师是谁？","options":[{"id":"ckc0lggzm00043b5vd62lvn3a","name":"伊泽瑞尔","count":5,"percent":0},{"id":"ckc0lgp7u00063b5v6mwzg9x9","name":"寡妇制造者","count":3,"percent":0},{"id":"ckc0lgwsy00083b5v8kui4q2r","name":"熔岩巨兽","count":32,"percent":100},{"id":"ckc0lha02000a3b5vug5b7io0","name":"皮城女警","count":15,"percent":0}],"voted":-1}

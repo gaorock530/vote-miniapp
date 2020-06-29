@@ -1,15 +1,16 @@
-import React, {useReducer} from 'react'
+import React, {useReducer, useRef} from 'react'
+import {useHistory} from 'react-router-dom'
 import cuid from 'cuid'
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'ADD':
-      return [...state, {id: cuid(), v: ''}]
+      return [...state, {id: cuid(), name: ''}]
     case 'DEL':
       return state.filter(op => op.id !== action.id)
     case 'CHA':
       return state.map(op => {
-        if (op.id === action.id) op.v = action.v
+        if (op.id === action.id) op.name = action.name
         return op
       })
     default:
@@ -20,40 +21,44 @@ const reducer = (state, action) => {
 export default () => {
 
   const [state, dispatch] = useReducer(reducer, [])
+  const title = useRef()
+  const history = useHistory()
 
   const add = () => dispatch({type: 'ADD'})
 
-  const onChange = (id, e) => dispatch({type: 'CHA', id, v: e.target.value})
+  const onChange = (id, e) => dispatch({type: 'CHA', id, name: e.target.value})
 
   const onDel = id => dispatch({type: 'DEL', id})
 
-  // useEffect(() => {
-  //   console.log(state)
-  // })
-
   const create = () => {
     let valid = true
-    console.log(state)
-    if (state.length < 2) return
+    const titleValue = title.current.value
+    if (!titleValue || state.length < 2) return
     for (let op of state) {
-      if (op.v.trim() === '') {
+      console.log(op)
+      if (op.name.trim() === '') {
         valid = false
         break
       }
-      
     }
 
     if (!valid) return;
 
-    console.log('Published!')
+    const id = cuid()
+    const vote = {id, title: titleValue, options: state, voted: -1}
 
+    console.log(vote)
+
+    localStorage.setItem(id, JSON.stringify(vote))
+    console.log('Published!')
+    history.push(`/vote/${id}`)
   }
 
   return (
     <div className="wrapper create">
       <label>
         标题：
-        <input type="text" name="title" style={{width: '100%'}}/>
+        <input type="text" name="title" style={{width: '100%'}} autoComplete="false" autoCorrect="false" autoFocus={true} ref={title}/>
       </label>
       <div className="create-vote-type">
         <label htmlFor="huey1"><input type="radio" id="huey1" name="drone" value="huey" defaultChecked />单选</label>
@@ -74,7 +79,7 @@ function Option ({index, op, onChange, onDel}) {
     <label>
       <span>选项{index+1}：</span>
       <div>
-        <input type="text" defaultValue={op.v} onChange={onChange.bind(this, op.id)}/>
+        <input type="text" defaultValue={op.name} onChange={onChange.bind(this, op.id)}/>
         <button onClick={onDel.bind(this, op.id)}>-</button>
       </div>
     </label>
